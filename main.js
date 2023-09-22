@@ -12,7 +12,7 @@ let perspectiveCamera, orthographicCamera, controls;
 let earth, water, moon;
 let lightWorld, lightMoon;
 
-let radius = 40;
+let radius = 45;
 let moonMov = true;
 let moonVelX = 0.0, moonVelY = 0.0;
 let moonOrbitX = 0.0, moonOrbitY = 0.0;
@@ -27,6 +27,27 @@ function init() {
 	/*** Creating world ***/
 	scene = new THREE.Scene();
 
+	const starGeometry = new THREE.SphereGeometry( 0.5, 32, 32 );
+	const starMaterial = new THREE.MeshPhongMaterial( {
+		color: 0xfffff0, 
+		emissive: 0xffffff,
+		emissiveIntensity: 0.5
+	} );
+
+	const size = 3000
+	for ( let i = 0; i < 7500; i ++ ) {
+		const star = new THREE.Mesh( starGeometry, starMaterial );
+
+		star.position.x = (Math.random() * size + Math.random() * size) / 2 - size / 2
+		star.position.y = (Math.random() * size + Math.random() * size) / 2 - size / 2
+		star.position.z = (Math.random() * size + Math.random() * size) / 2 - size / 2
+
+		star.updateMatrix();
+		star.matrixAutoUpdate = false;
+
+		scene.add( star );
+	}
+
 	/*** Creating and positioning the cameras***/
 	const aspect = window.innerWidth / window.innerHeight;
 
@@ -35,16 +56,6 @@ function init() {
 
 	orthographicCamera = new THREE.OrthographicCamera(frustumSize * aspect / - 2, frustumSize * aspect / 2, frustumSize / 2, frustumSize / - 2, 1, 1000);
 	orthographicCamera.position.z = 200;
-
-	/*** Loading backgroung ***/
-	const backGround = new THREE.TextureLoader();
-	backGround.load('https://images.pexels.com/photos/1205301/pexels-photo-1205301.jpeg', function(texture) {
-		texture.minFilter = THREE.LinearFilter;
-		texture.magFilter = THREE.LinearFilter;
-		texture.wrapS = THREE.RepeatWrapping;
-		texture.wrapT = THREE.RepeatWrapping;
-		scene.background = texture;  
-	});
 
 	/*** Loading ambient sound ***/
 	const listener = new THREE.AudioListener();
@@ -84,22 +95,21 @@ function init() {
 	textureMoon.repeat.set(1, 1);
 
 	/*** Creating water ***/
-	const waterGeometry = new THREE.SphereGeometry(30.5, 60, 60);
+	const waterGeometry = new THREE.SphereGeometry(31, 60, 60);
 	const waterMaterial = new THREE.MeshBasicMaterial({ color: 0x0000f0 });
 	water = new THREE.Mesh(waterGeometry, waterMaterial);
 	scene.add(water);
 
 	/*** Creating moon ***/
-	const moonGeometry = new THREE.SphereGeometry(3.5, 50, 50);
+	const moonGeometry = new THREE.SphereGeometry(4.5, 50, 50);
 	const moonMaterial = new THREE.MeshBasicMaterial({ map: textureMoon });
 	moon = new THREE.Mesh(moonGeometry, moonMaterial);
-	moon.position.set(60, 0, 0)
 	scene.add(moon);
 
 	/*** Creating the lights ***/
-	// lightWorld = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.05);
-	// lightWorld.position.set(0, 0, 0);
-	// scene.add(lightWorld);
+	lightWorld = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.1);
+	lightWorld.position.set(0, 0, 0);
+	scene.add(lightWorld);
 
 	lightMoon = new THREE.DirectionalLight(0xffffff, 0.5);
 	lightMoon.position.set(0, 0, 0);
@@ -107,7 +117,8 @@ function init() {
 
 	/*** Renderer ***/
 	renderer = new THREE.WebGLRenderer({ antialias: true }); // antialias suaviza as bordas da figuras 3D
-	renderer.setClearColor(0x000000);		
+	renderer.setClearColor(0x000000);
+	renderer.setPixelRatio(window.devicePixelRatio);		
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	document.body.appendChild(renderer.domElement);
 
