@@ -11,6 +11,7 @@ let perspectiveCamera, orthographicCamera, controls;
 
 let earth, water, moon;
 let lightWorld, lightMoon;
+let posiX, posiY, posiZ;
 
 let radius = 45;
 let moonMov = true;
@@ -35,17 +36,24 @@ function init() {
 	});
 
 	const size = 3000
-	for (let i = 0; i < 7500; i++) {
-		const star = new THREE.Mesh(starGeometry, starMaterial);
+	for ( let i = 0; i < 7500; i ++ ) {
+		const star = new THREE.Mesh( starGeometry, starMaterial );
+		
+		do{
+			star.position.x = (Math.random() * size + Math.random() * size) / 2 - size / 1.6;
+			star.position.y = (Math.random() * size + Math.random() * size) / 2 - size / 1.6;
+			star.position.z = (Math.random() * size + Math.random() * size) / 2 - size / 1.6;
+	
+			posiX = star.position.x;
+			posiY = star.position.y;
+			posiZ = star.position.x;
 
-		star.position.x = (Math.random() * size + Math.random() * size) / 2 - size / 2
-		star.position.y = (Math.random() * size + Math.random() * size) / 2 - size / 2
-		star.position.z = (Math.random() * size + Math.random() * size) / 2 - size / 2
+		} while(!(posiX < -100 || posiX > 100) && !(posiY < -100 || posiY > 100) && !(posiZ < -100 || posiZ > 100))
 
 		star.updateMatrix();
 		star.matrixAutoUpdate = false;
-
-		scene.add(star);
+	
+		scene.add( star );
 	}
 
 	/*** Creating and positioning the cameras***/
