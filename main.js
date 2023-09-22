@@ -10,12 +10,12 @@ let scene, renderer, stats;
 let perspectiveCamera, orthographicCamera, controls;
 
 let earth, water, moon;
-let light_world, light_moon;
+let lightWorld, lightMoon;
 
 let radius = 40;
-let moon_mov = true;
-let moon_vel_x = 0.0, moon_vel_y = 0.0;
-let moon_orbit_x = 0.0, moon_orbit_y = 0.0;
+let moonMov = true;
+let moonVelX = 0.0, moonVelY = 0.0;
+let moonOrbitX = 0.0, moonOrbitY = 0.0;
 
 const params = {
 	orthographicCamera: false
@@ -37,8 +37,14 @@ function init() {
 	orthographicCamera.position.z = 200;
 
 	/*** Loading backgroung ***/
-	//const backGround = new THREE.TextureLoader();
-	//scene.background = backGround.load('textures/galaxy.jpg',);
+	const backGround = new THREE.TextureLoader();
+	backGround.load('https://images.pexels.com/photos/1205301/pexels-photo-1205301.jpeg', function(texture) {
+		texture.minFilter = THREE.LinearFilter;
+		texture.magFilter = THREE.LinearFilter;
+		texture.wrapS = THREE.RepeatWrapping;
+		texture.wrapT = THREE.RepeatWrapping;
+		scene.background = texture;  
+	});
 
 	/*** Loading ambient sound ***/
 	const listener = new THREE.AudioListener();
@@ -72,36 +78,36 @@ function init() {
 	// texture_water.repeat.set( 1, 1);
 
 	/*** Loading moon texture ***/
-	const texture_moon = new THREE.TextureLoader().load("textures/moon.jpeg");
-	texture_moon.wrapS = THREE.RepeatWrapping;
-	texture_moon.wrapT = THREE.RepeatWrapping;
-	texture_moon.repeat.set(1, 1);
+	const textureMoon = new THREE.TextureLoader().load("textures/moon.jpeg");
+	textureMoon.wrapS = THREE.RepeatWrapping;
+	textureMoon.wrapT = THREE.RepeatWrapping;
+	textureMoon.repeat.set(1, 1);
 
 	/*** Creating water ***/
-	const water_geometry = new THREE.SphereGeometry(30.5, 60, 60);
-	const water_material = new THREE.MeshBasicMaterial({ color: 0x0000f0 });
-	water = new THREE.Mesh(water_geometry, water_material);
+	const waterGeometry = new THREE.SphereGeometry(30.5, 60, 60);
+	const waterMaterial = new THREE.MeshBasicMaterial({ color: 0x0000f0 });
+	water = new THREE.Mesh(waterGeometry, waterMaterial);
 	scene.add(water);
 
 	/*** Creating moon ***/
-	const moon_geometry = new THREE.SphereGeometry(3.5, 50, 50);
-	const moon_material = new THREE.MeshBasicMaterial({ map: texture_moon });
-	moon = new THREE.Mesh(moon_geometry, moon_material);
+	const moonGeometry = new THREE.SphereGeometry(3.5, 50, 50);
+	const moonMaterial = new THREE.MeshBasicMaterial({ map: textureMoon });
+	moon = new THREE.Mesh(moonGeometry, moonMaterial);
 	moon.position.set(60, 0, 0)
 	scene.add(moon);
 
 	/*** Creating the lights ***/
-	light_world = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.2);
-	light_world.position.set(0, 0, 0);
-	scene.add(light_world);
+	// lightWorld = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.05);
+	// lightWorld.position.set(0, 0, 0);
+	// scene.add(lightWorld);
 
-	light_moon = new THREE.DirectionalLight(0xffffff, 0.1);
-	light_moon.position.set(0, 0, 0);
-	scene.add(light_world);
+	lightMoon = new THREE.DirectionalLight(0xffffff, 0.5);
+	lightMoon.position.set(0, 0, 0);
+	scene.add(lightMoon);
 
 	/*** Renderer ***/
-	renderer = new THREE.WebGLRenderer({ antialias: true });		// antialias suaviza as bordas da figuras 3D
-
+	renderer = new THREE.WebGLRenderer({ antialias: true }); // antialias suaviza as bordas da figuras 3D
+	renderer.setClearColor(0x000000);		
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	document.body.appendChild(renderer.domElement);
 
@@ -158,26 +164,26 @@ function animate() {
 		earth.rotation.y += 0.0005;
 	}
 
-	if (water != null & moon_mov) {
-		water.position.x = 0.5 * Math.sin(moon_orbit_x) * Math.sin(moon_orbit_y);
-		water.position.y = 0.5 * Math.cos(moon_orbit_x)
-		water.position.z = 0.5 * Math.sin(moon_orbit_x) * Math.cos(moon_orbit_y);
+	if (water != null & moonMov) {
+		water.position.x = 0.5 * Math.sin(moonOrbitX) * Math.sin(moonOrbitY);
+		water.position.y = 0.5 * Math.cos(moonOrbitX)
+		water.position.z = 0.5 * Math.sin(moonOrbitX) * Math.cos(moonOrbitY);
 	}
 
 	if (moon != null) {
 		moon.rotation.x += 0.005;
 
-		if (moon_mov) {
-			moon_orbit_x += 1.4 * moon_vel_x;
-			moon_orbit_y += 1.4 * moon_vel_y;
+		if (moonMov) {
+			moonOrbitX += 1.4 * moonVelX;
+			moonOrbitY += 1.4 * moonVelY;
 
-			moon.position.x = radius * Math.sin(moon_orbit_x) * Math.sin(moon_orbit_y);
-			moon.position.y = radius * Math.cos(moon_orbit_x)
-			moon.position.z = radius * Math.sin(moon_orbit_x) * Math.cos(moon_orbit_y);
+			moon.position.x = radius * Math.sin(moonOrbitX) * Math.sin(moonOrbitY);
+			moon.position.y = radius * Math.cos(moonOrbitX)
+			moon.position.z = radius * Math.sin(moonOrbitX) * Math.cos(moonOrbitY);
 
-			light_moon.position.x = moon.position.x;
-			light_moon.position.y = moon.position.y;
-			light_moon.position.z = moon.position.z;
+			lightMoon.position.x = moon.position.x;
+			lightMoon.position.y = moon.position.y;
+			lightMoon.position.z = moon.position.z;
 		}
 	}
 
@@ -191,27 +197,27 @@ function render() {
 
 document.onkeydown = function (e) {
 	if (e.key == "ArrowUp") {
-		moon_vel_x = -2 * Math.PI / 1000;
-		moon_vel_y = 0;
+		moonVelX = -2 * Math.PI / 1000;
+		//moonVelY = 0;
 	}
 
 	if (e.key == "ArrowDown") {
-		moon_vel_x = 2 * Math.PI / 1000;
-		moon_vel_y = 0; 
+		moonVelX = 2 * Math.PI / 1000;
+		//moonVelY = 0; 
 	}
 
 	if (e.key == "ArrowLeft") {
-		moon_vel_y = -2 * Math.PI / 1000;
-		moon_vel_x = 0;
+		moonVelY = -2 * Math.PI / 1000;
+		//moonVelX = 0;
 	}
 
 	if (e.key == "ArrowRight") {
-		moon_vel_y = 2 * Math.PI / 1000;
-		moon_vel_x = 0;
+		moonVelY = 2 * Math.PI / 1000;
+		//moonVelX = 0;
 	}
 
 	if (e.key == " ") {
-		moon_mov = false;
+		moonMov = false;
 	}
 
 }
@@ -219,15 +225,15 @@ document.onkeydown = function (e) {
 document.onkeyup = function (e) {
 	console.log(e);
 	if (e.key == "ArrowUp" || e.key == "ArrowDown") {
-		moon_vel_x += 0.0;
+		moonVelX += 0.0;
 	}
 
 	if (e.key == "ArrowLeft" || e.key == "ArrowRight") {
-		moon_vel_y += 0.0;
+		moonVelY += 0.0;
 	}
 
 	if (e.key == " ") {
-		moon_mov = true;
+		moonMov = true;
 	}
 }
 
