@@ -27,16 +27,16 @@ function init() {
 	/*** Creating world ***/
 	scene = new THREE.Scene();
 
-	const starGeometry = new THREE.SphereGeometry( 0.5, 32, 32 );
-	const starMaterial = new THREE.MeshPhongMaterial( {
-		color: 0xfffff0, 
+	const starGeometry = new THREE.SphereGeometry(0.5, 32, 32);
+	const starMaterial = new THREE.MeshPhongMaterial({
+		color: 0xfffff0,
 		emissive: 0xffffff,
 		emissiveIntensity: 0.5
-	} );
+	});
 
 	const size = 3000
-	for ( let i = 0; i < 7500; i ++ ) {
-		const star = new THREE.Mesh( starGeometry, starMaterial );
+	for (let i = 0; i < 7500; i++) {
+		const star = new THREE.Mesh(starGeometry, starMaterial);
 
 		star.position.x = (Math.random() * size + Math.random() * size) / 2 - size / 2
 		star.position.y = (Math.random() * size + Math.random() * size) / 2 - size / 2
@@ -45,7 +45,7 @@ function init() {
 		star.updateMatrix();
 		star.matrixAutoUpdate = false;
 
-		scene.add( star );
+		scene.add(star);
 	}
 
 	/*** Creating and positioning the cameras***/
@@ -77,16 +77,10 @@ function init() {
 	loader.load('models/planet_material.glb', function (gltf) {
 		earth = gltf.scene;
 		scene.add(earth);
-	
+
 	}, undefined, function (error) {
 		console.error(error);
 	});
-
-	/*** Loading water texture ***/
-	// const texture_water = new THREE.TextureLoader().load( "models/water.jpg" );
-	// texture_water.wrapS = THREE.RepeatWrapping;
-	// texture_water.wrapT = THREE.RepeatWrapping;
-	// texture_water.repeat.set( 1, 1);
 
 	/*** Loading moon texture ***/
 	const textureMoon = new THREE.TextureLoader().load("textures/moon.jpeg");
@@ -95,9 +89,23 @@ function init() {
 	textureMoon.repeat.set(1, 1);
 
 	/*** Creating water ***/
-	const waterGeometry = new THREE.SphereGeometry(31, 60, 60);
-	const waterMaterial = new THREE.MeshBasicMaterial({ color: 0x0000f0 });
-	water = new THREE.Mesh(waterGeometry, waterMaterial);
+	const textureLoader = new THREE.TextureLoader();
+
+	const waterBaseColor = textureLoader.load("./textures/waterr/Water_002_COLOR.jpg");
+	const waterNormalMap = textureLoader.load("./textures/waterr/Water_002_NORM.jpg");
+	const waterHeightMap = textureLoader.load("./textures/waterr/Water_002_DISP.png");
+	const waterRoughness = textureLoader.load("./textures/waterr/Water_002_ROUGH.jpg");
+	const waterAmbientOcclusion = textureLoader.load("./textures/waterr/Water_002_OCC.jpg");
+
+	const waterGeometry = new THREE.SphereGeometry(30.5, 60, 60);
+	water = new THREE.Mesh(waterGeometry,
+		new THREE.MeshStandardMaterial({
+			map: waterBaseColor,
+			normalMap: waterNormalMap,
+			displacementMap: waterHeightMap, displacementScale: 0.05,
+			roughnessMap: waterRoughness, roughness: 0,
+			aoMap: waterAmbientOcclusion
+		}));
 	scene.add(water);
 
 	/*** Creating moon ***/
@@ -118,7 +126,7 @@ function init() {
 	/*** Renderer ***/
 	renderer = new THREE.WebGLRenderer({ antialias: true }); // antialias suaviza as bordas da figuras 3D
 	renderer.setClearColor(0x000000);
-	renderer.setPixelRatio(window.devicePixelRatio);		
+	renderer.setPixelRatio(window.devicePixelRatio);
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	document.body.appendChild(renderer.domElement);
 
@@ -144,7 +152,7 @@ function createControls(camera) {
 	controls.rotateSpeed = 2.0;
 	controls.zoomSpeed = 1.2;
 	controls.panSpeed = 1.8;
-	
+
 	controls.keys = ['KeyA', 'KeyS', 'KeyD'];
 }
 
@@ -179,6 +187,7 @@ function animate() {
 		water.position.x = 0.5 * Math.sin(moonOrbitX) * Math.sin(moonOrbitY);
 		water.position.y = 0.5 * Math.cos(moonOrbitX)
 		water.position.z = 0.5 * Math.sin(moonOrbitX) * Math.cos(moonOrbitY);
+		water.rotation.y -= 0.0040;
 	}
 
 	if (moon != null) {
