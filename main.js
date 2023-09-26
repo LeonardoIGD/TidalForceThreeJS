@@ -22,16 +22,12 @@ const params = {
 	orthographicCamera: false
 };
 
-const frustumSize = 400;
+const frustumSize = 400;		//Região de visualização tridimensional que a câmera captura e exibe na tela
 
 function init() {
+
 	/*** Creating world ***/
 	scene = new THREE.Scene();
-
-	const textureStar = new THREE.TextureLoader().load("textures/star.jpeg");
-	textureStar.wrapS = THREE.RepeatWrapping;
-	textureStar.wrapT = THREE.RepeatWrapping;
-	textureStar.repeat.set(1, 1);
 
 	const starGeometry = new THREE.SphereGeometry(0.5, 32, 32);
 	const starMaterial = new THREE.MeshPhongMaterial({
@@ -70,10 +66,11 @@ function init() {
 	orthographicCamera = new THREE.OrthographicCamera(frustumSize * aspect / - 2, frustumSize * aspect / 2, frustumSize / 2, frustumSize / - 2, 1, 1000);
 	orthographicCamera.position.z = 200;
 
+	
 	/*** Loading ambient sound ***/
 	const listener = new THREE.AudioListener();
-	perspectiveCamera.add(listener);
 	orthographicCamera.add(listener)
+	perspectiveCamera.add(listener);
 
 	const sound = new THREE.Audio(listener);
 	const audioLoader = new THREE.AudioLoader();
@@ -159,6 +156,7 @@ function init() {
 	createControls(perspectiveCamera);
 }
 
+/*** Creating camera controls ***/
 function createControls(camera) {
 	controls = new TrackballControls(camera, renderer.domElement);
 
@@ -167,6 +165,7 @@ function createControls(camera) {
 	controls.panSpeed = 1.8;
 }
 
+/*** Page responsiveness ***/
 function onWindowResize() {
 	const aspect = window.innerWidth / window.innerHeight;
 
@@ -187,7 +186,7 @@ function onWindowResize() {
 function animate() {
 	requestAnimationFrame(animate);		// Realizar animações de maneira mais eficiente;
 
-	controls.update();					
+	controls.update();					// Atualizar os controles de câmera
 	stats.update();						// Atualiza os dados do desempenho (fps)
 
 	if (earth != null) {
