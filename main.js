@@ -104,11 +104,11 @@ function init() {
 	/*** Creating water ***/
 	const textureLoader = new THREE.TextureLoader();
 
-	const waterBaseColor = textureLoader.load("./textures/waterr/Water_002_COLOR.jpg");
-	const waterNormalMap = textureLoader.load("./textures/waterr/Water_002_NORM.jpg");
-	const waterHeightMap = textureLoader.load("./textures/waterr/Water_002_DISP.png");
-	const waterRoughness = textureLoader.load("./textures/waterr/Water_002_ROUGH.jpg");
-	const waterAmbientOcclusion = textureLoader.load("./textures/waterr/Water_002_OCC.jpg");
+	const waterBaseColor = textureLoader.load("./textures/water/Water_002_COLOR.jpg");
+	const waterNormalMap = textureLoader.load("./textures/water/Water_002_NORM.jpg");
+	const waterHeightMap = textureLoader.load("./textures/water/Water_002_DISP.png");
+	const waterRoughness = textureLoader.load("./textures/water/Water_002_ROUGH.jpg");
+	const waterAmbientOcclusion = textureLoader.load("./textures/water/Water_002_OCC.jpg");
 
 	const waterGeometry = new THREE.SphereGeometry(30.5, 60, 60);
 	const waterMaterial = new THREE.MeshStandardMaterial({
