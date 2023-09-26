@@ -28,6 +28,11 @@ function init() {
 	/*** Creating world ***/
 	scene = new THREE.Scene();
 
+	const textureStar = new THREE.TextureLoader().load("textures/star.jpeg");
+	textureStar.wrapS = THREE.RepeatWrapping;
+	textureStar.wrapT = THREE.RepeatWrapping;
+	textureStar.repeat.set(1, 1);
+
 	const starGeometry = new THREE.SphereGeometry(0.5, 32, 32);
 	const starMaterial = new THREE.MeshPhongMaterial({
 		color: 0xfffff0,
@@ -106,14 +111,14 @@ function init() {
 	const waterAmbientOcclusion = textureLoader.load("./textures/waterr/Water_002_OCC.jpg");
 
 	const waterGeometry = new THREE.SphereGeometry(30.5, 60, 60);
-	water = new THREE.Mesh(waterGeometry,
-		new THREE.MeshStandardMaterial({
-			map: waterBaseColor,
-			normalMap: waterNormalMap,
-			displacementMap: waterHeightMap, displacementScale: 0.05,
-			roughnessMap: waterRoughness, roughness: 0,
-			aoMap: waterAmbientOcclusion
-		}));
+	const waterMaterial = new THREE.MeshStandardMaterial({
+		map: waterBaseColor,
+		normalMap: waterNormalMap,
+		displacementMap: waterHeightMap, displacementScale: 0.05,
+		roughnessMap: waterRoughness, roughness: 0,
+		aoMap: waterAmbientOcclusion
+	});
+	water = new THREE.Mesh(waterGeometry, waterMaterial);
 	scene.add(water);
 
 	/*** Creating moon ***/
@@ -192,9 +197,9 @@ function animate() {
 	}
 
 	if (water != null & moonMov) {
-		water.position.x = 0.5 * Math.sin(moonOrbitX) * Math.sin(moonOrbitY);
-		water.position.y = 0.5 * Math.cos(moonOrbitX)
-		water.position.z = 0.5 * Math.sin(moonOrbitX) * Math.cos(moonOrbitY);
+		water.position.x = 1 * Math.sin(moonOrbitX) * Math.sin(moonOrbitY);
+		water.position.y = 1 * Math.cos(moonOrbitX)
+		water.position.z = 1 * Math.sin(moonOrbitX) * Math.cos(moonOrbitY);
 		water.rotation.y -= 0.0040;
 	}
 
