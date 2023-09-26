@@ -165,8 +165,6 @@ function createControls(camera) {
 	controls.rotateSpeed = 2.0;
 	controls.zoomSpeed = 1.2;
 	controls.panSpeed = 1.8;
-
-	controls.keys = ['KeyA', 'KeyS', 'KeyD'];
 }
 
 function onWindowResize() {
@@ -189,7 +187,7 @@ function onWindowResize() {
 function animate() {
 	requestAnimationFrame(animate);		// Realizar animações de maneira mais eficiente;
 
-	controls.update();
+	controls.update();					
 	stats.update();						// Atualiza os dados do desempenho (fps)
 
 	if (earth != null) {
@@ -231,22 +229,18 @@ function render() {
 document.onkeydown = function (e) {
 	if (e.key == "ArrowUp") {
 		moonVelX = -2 * Math.PI / 1000;
-		//moonVelY = 0;
 	}
 
 	if (e.key == "ArrowDown") {
 		moonVelX = 2 * Math.PI / 1000;
-		//moonVelY = 0; 
 	}
 
 	if (e.key == "ArrowLeft") {
 		moonVelY = -2 * Math.PI / 1000;
-		//moonVelX = 0;
 	}
 
 	if (e.key == "ArrowRight") {
 		moonVelY = 2 * Math.PI / 1000;
-		//moonVelX = 0;
 	}
 
 	if (e.key == " ") {
