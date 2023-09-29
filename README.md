@@ -16,7 +16,7 @@ npx serve .
 
 Now, if you want to view the results in a simpler way, just access the link below:
 
-
+[Here...](https://leonardoigd.github.io/TidalForceThreeJS/src/)
 
 ## :video_game: Controls
 
@@ -49,7 +49,7 @@ With the mouse, it's possible to move around the scene.
 
 For a better visualization of the ocean's movement, it was necessary to apply relief to the object representing our globe. So, for enhanced visualization and quality, we decided to import a pre-made model created by a user on SketchFab.
 
-![3DModel](models/planet_material.gif)
+![3DModel](src/models/planet_material.gif)
 
 Creator: [berzerkey](https://sketchfab.com/berzerkey)
 
