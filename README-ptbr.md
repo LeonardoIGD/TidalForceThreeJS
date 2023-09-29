@@ -16,7 +16,7 @@ npx serve .
 
 Agora caso queira visualizar o resultado de maniera mais simples, basta acessar o link abaixo:
 
-
+[Aqui...](https://leonardoigd.github.io/TidalForceThreeJS/src/)
 
 ## :video_game: Controles
 
@@ -49,7 +49,7 @@ Já com o mouse, é possível movimentar a na cena.
 
 Para uma melhor visualização da movimentação das águas do oceano era necessário aplicar um relevo no objeto que representa o nosso globo, então para uma melhor visualização e qualidade decidimos importar um modelo pronto feito por um usuário no SketchFab.
 
-![Modelo3D](models/planet_material.gif)
+![Modelo3D](src/models/planet_material.gif)
 
 Criador: [berzerkey](https://sketchfab.com/berzerkey)
 
