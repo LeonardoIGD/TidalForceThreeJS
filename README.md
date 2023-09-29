@@ -55,6 +55,6 @@ Creator: [berzerkey](https://sketchfab.com/berzerkey)
 
 ## :bust_in_silhouette::bust_in_silhouette: Made by:
 
-:man_teacher: Teacher: Me. Marco Diego Aurelio Mesquita <br>.
-:man_student: Dev: [Kennedy Alves Pereira](https://github.com/kennedyAlvess) <br>.
-:man_student: Dev: [Leonardo Inácio Guilherme Dantas](https://github.com/LeonardoIGD) <br>.
+:man_teacher: Teacher: Me. Marco Diego Aurelio Mesquita. <br>
+:man_student: Dev: [Kennedy Alves Pereira](https://github.com/kennedyAlvess). <br>
+:man_student: Dev: [Leonardo Inácio Guilherme Dantas](https://github.com/LeonardoIGD). <br>
