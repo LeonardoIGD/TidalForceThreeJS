@@ -11,7 +11,7 @@ The project consists of simulating the effects on oceans caused by the moon's mo
 To perform the project execution on your machine, download the files from the repository, and at the project's root, execute:
 
 ```
-	npx serve .
+npx serve .
 ```
 
 Now, if you want to view the results in a simpler way, just access the link below:
@@ -55,6 +55,6 @@ Creator: [berzerkey](https://sketchfab.com/berzerkey)
 
 ## :bust_in_silhouette::bust_in_silhouette: Made by:
 
-:man_teacher: Teacher: Me. Marco Diego Aurelio Mesquita 
-:man_student: Dev: [Kennedy Alves Pereira](https://github.com/kennedyAlvess) 
-:man_student: Dev: [Leonardo Inácio Guilherme Dantas](https://github.com/LeonardoIGD) 
+:man_teacher: Teacher: Me. Marco Diego Aurelio Mesquita <br>.
+:man_student: Dev: [Kennedy Alves Pereira](https://github.com/kennedyAlvess) <br>.
+:man_student: Dev: [Leonardo Inácio Guilherme Dantas](https://github.com/LeonardoIGD) <br>.
