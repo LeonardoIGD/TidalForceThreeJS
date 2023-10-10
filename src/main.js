@@ -10,13 +10,15 @@ let scene, renderer, stats;
 let perspectiveCamera, orthographicCamera, controls;
 
 let earth, water, moon;
-let lightWorld, lightMoon;
+let lightWorld, lightMoon, lightSun;
 let posiX, posiY, posiZ;
 
 let radius = 45;
 let moonMov = true;
 let moonVelX = 0.0, moonVelY = 0.0;
 let moonOrbitX = 0.0, moonOrbitY = 0.0;
+
+let shadowSize = 512;
 
 const params = {
 	orthographicCamera: false
@@ -86,6 +88,14 @@ function init() {
 
 	loader.load('models/planet_material.glb', function (gltf) {
 		earth = gltf.scene;
+		
+		earth.traverse( function ( node ) {
+			if ( node.isMesh ){
+				node.castShadow = true;
+				node.receiveShadow = true;
+			}
+		});
+
 		scene.add(earth);
 
 	}, undefined, function (error) {
@@ -113,31 +123,48 @@ function init() {
 		normalMap: waterNormalMap,
 		displacementMap: waterHeightMap, displacementScale: 0.05,
 		roughnessMap: waterRoughness, roughness: 0,
-		aoMap: waterAmbientOcclusion
+		aoMap: waterAmbientOcclusion,
 	});
 	water = new THREE.Mesh(waterGeometry, waterMaterial);
+	water.receiveShadow = true;
 	scene.add(water);
 
 	/*** Creating moon ***/
 	const moonGeometry = new THREE.SphereGeometry(4.5, 50, 50);
 	const moonMaterial = new THREE.MeshBasicMaterial({ map: textureMoon });
 	moon = new THREE.Mesh(moonGeometry, moonMaterial);
+	moon.castShadow = true;
 	scene.add(moon);
 
 	/*** Creating the lights ***/
-	lightWorld = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.1);
-	lightWorld.position.set(0, 0, 0);
+	lightWorld = new THREE.HemisphereLight( 0xffffff, 0xffffff, 0.1 );
+	lightWorld.position.set( 0, 0, 0 );
 	scene.add(lightWorld);
 
-	lightMoon = new THREE.DirectionalLight(0xffffff, 0.5);
-	lightMoon.position.set(0, 0, 0);
+	lightMoon = new THREE.DirectionalLight( 0xffffff, 0.5 );
+	lightMoon.position.set( 0, 0, 0 );
 	scene.add(lightMoon);
+
+	lightSun = new THREE.DirectionalLight( 0xFC5404, 6 );
+	lightSun.position.set( 0, 500, 0 )
+
+	/*** Resizing the shadow radius ***/
+	lightSun.shadow.camera.left = 30;
+	lightSun.shadow.camera.right = -30;
+	lightSun.shadow.camera.top = 30;
+	lightSun.shadow.camera.bottom = -30;
+
+	/*** Casting shadow ***/
+	lightSun.castShadow = true;
+	scene.add(lightSun)
 
 	/*** Renderer ***/
 	renderer = new THREE.WebGLRenderer({ antialias: true }); // antialias suaviza as bordas da figuras 3D
 	renderer.setClearColor(0x000000);
 	renderer.setPixelRatio(window.devicePixelRatio);
 	renderer.setSize(window.innerWidth, window.innerHeight);
+	renderer.shadowMap.enabled = true;
+	renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 	document.body.appendChild(renderer.domElement);
 
 	/*** View performance statistics ***/
