@@ -1,32 +1,30 @@
 import * as THREE from 'three';
-import dat from "https://cdn.skypack.dev/dat.gui";
 
+import dat from "https://cdn.skypack.dev/dat.gui";
 import Stats from 'three/addons/libs/stats.module.js';
 
-//import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { TrackballControls } from 'three/addons/controls/TrackballControls.js';
 
 let scene, renderer, stats;
-let perspectiveCamera, orthographicCamera, controls;
+let perspectiveCamera, orthographicCamera, automaticCamera, controls;
 
 let earth, water, moon;
 let lightWorld, intensityWorld, lightMoon, intensityMoon, lightSun, intensitySun;
 let posiX, posiY, posiZ;
 
-let radius = 45;
+let theta = 0.1, radius = 45;
 let moonMov = true;
 let moonVelX = 0.0, moonVelY = 0.0;
 let force, moonOrbitX = 0.0, moonOrbitY = 0.0;
 
-let shadowSize = 512;
-
 const params = {
 	orthographicCamera: false,
+	automaticCamera: false,
 	force: 1,
 	intensityWorld: 0.1,
 	intensitySun: 6,
-	intensityMoon: 0.5
+	intensityMoon: 0.5,
 };
 
 const frustumSize = 400;		//Região de visualização tridimensional que a câmera captura e exibe na tela
@@ -73,7 +71,6 @@ function init() {
 	orthographicCamera = new THREE.OrthographicCamera(frustumSize * aspect / - 2, frustumSize * aspect / 2, frustumSize / 2, frustumSize / - 2, 1, 1000);
 	orthographicCamera.position.z = 200;
 
-	
 	/*** Loading ambient sound ***/
 	const listener = new THREE.AudioListener();
 	orthographicCamera.add(listener)
@@ -187,13 +184,11 @@ function init() {
 			controls.dispose();
 			createControls(value ? orthographicCamera : perspectiveCamera);
 		});
-
 	camera
-		.add(params, 'orthographicCamera')
+		.add(params, 'automaticCamera')
 		.name('Automatic')
 		.onChange(function (value) {
-			controls.dispose();
-			createControls(value ? orthographicCamera : perspectiveCamera);
+			params.automaticCamera = value;
 		});
 
 	let tidal = gui.addFolder("Tidal");
@@ -211,20 +206,19 @@ function init() {
 		.onChange(function (value) {
 			params.intensityWorld = value;
 		});
-
 	lighting
 		.add(params, 'intensityMoon', 0.1, 2, 0.1)
 		.name('Moon')
 		.onChange(function (value) {
 			params.intensityMoon = value;
 		});
-
 	lighting
 		.add(params, 'intensitySun', 1, 20, 1)
 		.name('Sun')
 		.onChange(function (value) {
 			params.intensitySun = value;
 		});
+	
 
 	window.addEventListener('resize', onWindowResize);
 	createControls(perspectiveCamera);
@@ -263,6 +257,8 @@ function animate() {
 	controls.update();					// Atualizar os controles de câmera
 	stats.update();						// Atualiza os dados do desempenho (fps)
 
+	theta += 0.005;
+
 	lightWorld.intensity = params.intensityWorld;
 	lightMoon.intensity = params.intensityMoon;
 	lightSun.intensity = params.intensitySun;
@@ -300,6 +296,13 @@ function animate() {
 
 function render() {
 	const camera = (params.orthographicCamera) ? orthographicCamera : perspectiveCamera;
+
+	if(params.automaticCamera == true){
+		camera.position.x = 1.9 * 200 * Math.sin(theta);
+		camera.position.y = 1.5 * 200 * Math.sin(theta) * Math.cos(theta);
+		camera.position.z = 80 * Math.cos(theta);
+	}
+
 	renderer.render(scene, camera);
 }
 
