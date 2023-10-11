@@ -1,8 +1,9 @@
 import * as THREE from 'three';
+import dat from "https://cdn.skypack.dev/dat.gui";
 
 import Stats from 'three/addons/libs/stats.module.js';
 
-import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+//import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { TrackballControls } from 'three/addons/controls/TrackballControls.js';
 
@@ -10,18 +11,22 @@ let scene, renderer, stats;
 let perspectiveCamera, orthographicCamera, controls;
 
 let earth, water, moon;
-let lightWorld, lightMoon, lightSun;
+let lightWorld, intensityWorld, lightMoon, intensityMoon, lightSun, intensitySun;
 let posiX, posiY, posiZ;
 
 let radius = 45;
 let moonMov = true;
 let moonVelX = 0.0, moonVelY = 0.0;
-let moonOrbitX = 0.0, moonOrbitY = 0.0;
+let force, moonOrbitX = 0.0, moonOrbitY = 0.0;
 
 let shadowSize = 512;
 
 const params = {
-	orthographicCamera: false
+	orthographicCamera: false,
+	force: 1,
+	intensityWorld: 0.1,
+	intensitySun: 6,
+	intensityMoon: 0.5
 };
 
 const frustumSize = 400;		//Região de visualização tridimensional que a câmera captura e exibe na tela
@@ -172,12 +177,54 @@ function init() {
 	document.body.appendChild(stats.dom);
 
 	/*** Creating GUI interface ***/
-	const gui = new GUI();
-	gui.add(params, 'orthographicCamera').name('use orthographic').onChange(function (value) {
-		controls.dispose();
-		createControls(value ? orthographicCamera : perspectiveCamera);
+	const gui = new dat.GUI();
 
-	});
+	let camera = gui.addFolder("Camera");
+	camera
+		.add(params, 'orthographicCamera')
+		.name('Orthographic')
+		.onChange(function (value) {
+			controls.dispose();
+			createControls(value ? orthographicCamera : perspectiveCamera);
+		});
+
+	camera
+		.add(params, 'orthographicCamera')
+		.name('Automatic')
+		.onChange(function (value) {
+			controls.dispose();
+			createControls(value ? orthographicCamera : perspectiveCamera);
+		});
+
+	let tidal = gui.addFolder("Tidal");
+	tidal
+		.add(params, 'force', 0.1, 2.5, 0.1)
+		.name('Force')
+		.onChange(function (value) {
+			params.force = value;
+		});
+
+	let lighting = gui.addFolder("Lighting Intensity");
+	lighting
+		.add(params, 'intensityWorld', 0.1, 2, 0.1)
+		.name('World')
+		.onChange(function (value) {
+			params.intensityWorld = value;
+		});
+
+	lighting
+		.add(params, 'intensityMoon', 0.1, 2, 0.1)
+		.name('Moon')
+		.onChange(function (value) {
+			params.intensityMoon = value;
+		});
+
+	lighting
+		.add(params, 'intensitySun', 1, 20, 1)
+		.name('Sun')
+		.onChange(function (value) {
+			params.intensitySun = value;
+		});
 
 	window.addEventListener('resize', onWindowResize);
 	createControls(perspectiveCamera);
@@ -216,14 +263,18 @@ function animate() {
 	controls.update();					// Atualizar os controles de câmera
 	stats.update();						// Atualiza os dados do desempenho (fps)
 
+	lightWorld.intensity = params.intensityWorld;
+	lightMoon.intensity = params.intensityMoon;
+	lightSun.intensity = params.intensitySun;
+
 	if (earth != null) {
 		earth.rotation.y += 0.0005;
 	}
 
 	if (water != null & moonMov) {
-		water.position.x = 1 * Math.sin(moonOrbitX) * Math.sin(moonOrbitY);
-		water.position.y = 1 * Math.cos(moonOrbitX)
-		water.position.z = 1 * Math.sin(moonOrbitX) * Math.cos(moonOrbitY);
+		water.position.x = params.force * Math.sin(moonOrbitX) * Math.sin(moonOrbitY);
+		water.position.y = params.force * Math.cos(moonOrbitX)
+		water.position.z = params.force * Math.sin(moonOrbitX) * Math.cos(moonOrbitY);
 		water.rotation.y -= 0.0040;
 	}
 
