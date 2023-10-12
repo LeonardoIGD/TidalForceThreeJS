@@ -7,13 +7,17 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { TrackballControls } from 'three/addons/controls/TrackballControls.js';
 
 let scene, renderer, stats;
-let perspectiveCamera, orthographicCamera, automaticCamera, controls;
+let perspectiveCamera, orthographicCamera, automaticCamera, controls, sound, volume;
 
 let earth, water, moon;
 let lightWorld, intensityWorld, lightMoon, intensityMoon, lightSun, intensitySun;
 let posiX, posiY, posiZ;
 
-let theta = 0.1, radius = 45;
+let vertices = [],  indices = [], uvs = [];
+let widthSegms = 64.0, heightSegms = 32.0, radiusMoon = 4.5;
+let thetaMoon, phiMoon;
+
+let theta = 0.1, radiusOrbitMoon = 45.0;
 let moonMov = true;
 let moonVelX = 0.0, moonVelY = 0.0;
 let force, moonOrbitX = 0.0, moonOrbitY = 0.0;
@@ -25,6 +29,7 @@ const params = {
 	intensityWorld: 0.1,
 	intensitySun: 6,
 	intensityMoon: 0.5,
+	volume: 0.2
 };
 
 const frustumSize = 400;		//Região de visualização tridimensional que a câmera captura e exibe na tela
@@ -41,10 +46,11 @@ function init() {
 		emissiveIntensity: 0.5
 	});
 
-	const size = 3000
-	for ( let i = 0; i < 7500; i ++ ) {
+	const size = 3000;
+	
+	for ( let i = 0; i < 4500; i ++ ) {
 		const star = new THREE.Mesh( starGeometry, starMaterial );
-		
+
 		do{
 			star.position.x = (Math.random() * size + Math.random() * size) / 2 - size / 1.6;
 			star.position.y = (Math.random() * size + Math.random() * size) / 2 - size / 1.6;
@@ -76,7 +82,7 @@ function init() {
 	orthographicCamera.add(listener)
 	perspectiveCamera.add(listener);
 
-	const sound = new THREE.Audio(listener);
+	sound = new THREE.Audio(listener);
 	const audioLoader = new THREE.AudioLoader();
 	audioLoader.load('sounds/ocean.m4a', function (buffer) {
 		sound.setBuffer(buffer);
@@ -110,6 +116,59 @@ function init() {
 	textureMoon.wrapT = THREE.RepeatWrapping;
 	textureMoon.repeat.set(1, 1);
 
+	/*** Creating moon ***/
+	for (let i = 0; i <= heightSegms; i++) {
+		thetaMoon = (i * Math.PI) / heightSegms;
+	
+		for (var j = 0; j <= widthSegms; j++) {
+			phiMoon = (j * 2 * Math.PI) / widthSegms;
+
+			let uMoon = j / widthSegms;
+			let vMoon = i / heightSegms;
+			uvs.push(uMoon, vMoon);
+
+			let xMoon = radiusMoon * Math.sin(thetaMoon) * Math.cos(phiMoon) ;
+			let yMoon = radiusMoon * Math.cos(thetaMoon);
+			let zMoon = radiusMoon * Math.sin(thetaMoon) * Math.sin(phiMoon);
+	
+			vertices.push(xMoon, yMoon, zMoon);
+	
+			if (i < heightSegms && j < widthSegms) {
+				let base = i * (widthSegms + 1) + j;
+
+				let topLeft = base;
+				let topRight = base + 1;
+				let bottomLeft = base + widthSegms + 1;
+				let bottomRight = base + widthSegms + 2;
+	
+				indices.push(topLeft, bottomLeft, topRight);
+				indices.push(topRight, bottomLeft, bottomRight);
+			}
+		}
+	}
+
+	let positionAttribute = new THREE.Float32BufferAttribute(vertices, 3);
+	let indexAttribute = new THREE.Uint32BufferAttribute(indices, 1);
+	let uvAttribute = new THREE.Float32BufferAttribute(uvs, 2);
+
+	const moonGeometry = new THREE.BufferGeometry();
+	const moonMaterial = new THREE.MeshBasicMaterial({ map: textureMoon });
+	
+	moonGeometry.setAttribute('position', positionAttribute);
+	moonGeometry.setIndex(indexAttribute);
+	moonGeometry.setAttribute('uv', uvAttribute);
+
+	moon = new THREE.Mesh(moonGeometry, moonMaterial);
+	moon.castShadow = true;
+	scene.add(moon);
+
+	/*
+	// const moonGeometry = new THREE.SphereGeometry(4.5, 50, 50);
+	// const moonMaterial = new THREE.MeshBasicMaterial({ map: textureMoon });
+	// moon = new THREE.Mesh(moonGeometry, moonMaterial);
+	// moon.castShadow = true;
+	// scene.add(moon); /**/
+
 	/*** Creating water ***/
 	const textureLoader = new THREE.TextureLoader();
 
@@ -130,13 +189,6 @@ function init() {
 	water = new THREE.Mesh(waterGeometry, waterMaterial);
 	water.receiveShadow = true;
 	scene.add(water);
-
-	/*** Creating moon ***/
-	const moonGeometry = new THREE.SphereGeometry(4.5, 50, 50);
-	const moonMaterial = new THREE.MeshBasicMaterial({ map: textureMoon });
-	moon = new THREE.Mesh(moonGeometry, moonMaterial);
-	moon.castShadow = true;
-	scene.add(moon);
 
 	/*** Creating the lights ***/
 	lightWorld = new THREE.HemisphereLight( 0xffffff, 0xffffff, 0.1 );
@@ -191,6 +243,14 @@ function init() {
 			params.automaticCamera = value;
 		});
 
+	let soundtrack = gui.addFolder("SoundTrack");
+	soundtrack
+		.add(params, 'volume', 0.1, 3.0, 0.1)
+		.name('Volume')
+		.onChange(function (value) {
+			params.volume = value;
+		});
+
 	let tidal = gui.addFolder("Tidal");
 	tidal
 		.add(params, 'force', 0.1, 2.5, 0.1)
@@ -212,6 +272,7 @@ function init() {
 		.onChange(function (value) {
 			params.intensityMoon = value;
 		});
+
 	lighting
 		.add(params, 'intensitySun', 1, 20, 1)
 		.name('Sun')
@@ -263,6 +324,10 @@ function animate() {
 	lightMoon.intensity = params.intensityMoon;
 	lightSun.intensity = params.intensitySun;
 
+	if(sound != null){
+		sound.setVolume(params.volume);
+	}
+
 	if (earth != null) {
 		earth.rotation.y += 0.0005;
 	}
@@ -281,9 +346,9 @@ function animate() {
 			moonOrbitX += 1.4 * moonVelX;
 			moonOrbitY += 1.4 * moonVelY;
 
-			moon.position.x = radius * Math.sin(moonOrbitX) * Math.sin(moonOrbitY);
-			moon.position.y = radius * Math.cos(moonOrbitX)
-			moon.position.z = radius * Math.sin(moonOrbitX) * Math.cos(moonOrbitY);
+			moon.position.x = radiusOrbitMoon * Math.sin(moonOrbitX) * Math.sin(moonOrbitY);
+			moon.position.y = radiusOrbitMoon * Math.cos(moonOrbitX)
+			moon.position.z = radiusOrbitMoon * Math.sin(moonOrbitX) * Math.cos(moonOrbitY);
 
 			lightMoon.position.x = moon.position.x;
 			lightMoon.position.y = moon.position.y;
@@ -298,9 +363,11 @@ function render() {
 	const camera = (params.orthographicCamera) ? orthographicCamera : perspectiveCamera;
 
 	if(params.automaticCamera == true){
-		camera.position.x = 1.9 * 200 * Math.sin(theta);
-		camera.position.y = 1.5 * 200 * Math.sin(theta) * Math.cos(theta);
-		camera.position.z = 80 * Math.cos(theta);
+		camera.position.x = 1.6 * 180 * Math.sin(theta);
+		camera.position.y = 1.9 * 150 * Math.sin(theta) * Math.cos(theta);
+		camera.position.z = 60 * Math.cos(theta);
+
+		moonVelX = -2 * Math.PI / 1300;
 	}
 
 	renderer.render(scene, camera);
