@@ -1,3 +1,5 @@
+[![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/LeonardoIGD/TidalForceThreeJS/blob/main/README.md)
+
 # ForçaMaréThreeJS
 
 > A simulação da força maré é o resultado do desenvolvimento de um projeto utilizando as linguagens HTML e JavaScript em conjunto a biblioteca THREE.js. O seu desenvolvimento teve como objetivo avaliativo, explorando principalmente os conceitos vistos nas aulas de Computação Gráfico no curso de Tecnologia da Informação - UFERSA.
