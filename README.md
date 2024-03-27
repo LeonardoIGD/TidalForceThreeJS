@@ -1,3 +1,6 @@
+[![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/LeonardoIGD/TidalForceThreeJS/blob/main/README.md)
+&emsp; [![pt-br](https://img.shields.io/badge/lang-pt--br-green.svg)](https://github.com/LeonardoIGD/TidalForceThreeJS/blob/main/README-ptbr.md)
+
 # TidalForceThreeJS
 
 > The simulation of tidal force is the outcome of a project developed using HTML and JavaScript languages along with the THREE.js library. Its development had an evaluative purpose, mainly exploring the concepts taught in the Computer Graphics classes within the Information Technology course at UFERSA.
